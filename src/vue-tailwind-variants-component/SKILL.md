@@ -90,6 +90,8 @@ When rendering the main element or wrapper component, merge generated classes wi
 Preferred pattern for wrapper/base class application:
 - `ui.base({ class: [props.ui?.base, props.class] })`
 
+Keep `props.class` last in the array so caller-provided classes have the final precedence.
+
 If multiple slots exist, pass overrides slot-by-slot using the same idea.
 
 ### 7. Apply wrapper-specific patterns when requested
@@ -108,7 +110,7 @@ Before finishing, verify that:
 - the component name matches the file or requested name
 - `Props`, `Emits`, and `Slots` names are consistent
 - `ui` typing points to `typeof recipe.slots`
-- the template merges `props.ui` and `props.class` correctly
+- the template merges `props.ui` and `props.class` correctly, with `props.class` last for precedence
 - no unnecessary imports were introduced
 - the output is valid Vue + TypeScript for the current project style
 
