@@ -22,6 +22,8 @@ Generate a Vue component that:
 3. Decides correctly whether `tv` must be imported or can be omitted.
 4. Exposes `class` and `ui` props in a way that allows consumer overrides.
 5. Keeps the output ready to edit rather than over-filling business logic.
+6. Places all imports at the top of the first `<script lang="ts">` block when a component uses both a normal script block and a `<script setup>` block.
+7. Never creates empty `tv` slot keys such as `base: ''` or `content: ''`.
 
 ## Import decision for `tv`
 
@@ -57,12 +59,19 @@ Start from this structure unless the project uses a different established patter
 - a `<script lang="ts" setup>` block for props, emits, slots, and derived `ui`
 - a `<template>` block with minimal but valid markup
 
+When both script blocks are present:
+- put all imports in the first `<script lang="ts">` block
+- do not place imports in the second `<script setup>` block
+- keep the second block focused on props, emits, slots, state, and derived values
+
 ### 3. Create the `tv(...)` recipe
 
 Use a named recipe derived from the component name and define slot-based styles, for example a `base` slot first. Keep the initial recipe minimal unless the user asked for concrete variants.
 
 Typical shape:
-- `const componentName = tv({ slots: { base: '' } })`
+- `const componentName = tv({ slots: { base: '...' } })`
+- add slot keys only when they have real classes to apply
+- never add placeholder slot entries with empty strings just to reserve future override points
 - add variants or compound variants only when requested or when the surrounding codebase expects them
 
 ### 4. Export the TypeScript contracts
@@ -90,9 +99,8 @@ When rendering the main element or wrapper component, merge generated classes wi
 Preferred pattern for wrapper/base class application:
 - `ui.base({ class: [props.ui?.base, props.class] })`
 
-Keep `props.class` last in the array so caller-provided classes have the final precedence.
-
-If multiple slots exist, pass overrides slot-by-slot using the same idea.
+If multiple styled slots exist, pass overrides slot-by-slot using the same idea.
+If an element has no local classes, do not create a `tv` slot key for it and do not wire a matching `props.ui` access for that element.
 
 ### 7. Apply wrapper-specific patterns when requested
 
@@ -107,10 +115,12 @@ Keep placeholder text intentionally lightweight so the user can adapt it.
 
 Before finishing, verify that:
 - the `tv` import decision matches visible project evidence
+- all imports live at the top of the first `<script lang="ts">` block when dual script blocks are used
 - the component name matches the file or requested name
 - `Props`, `Emits`, and `Slots` names are consistent
 - `ui` typing points to `typeof recipe.slots`
-- the template merges `props.ui` and `props.class` correctly, with `props.class` last for precedence
+- the template merges `props.ui` and `props.class` correctly
+- the `tv` recipe contains no empty string slot placeholders
 - no unnecessary imports were introduced
 - the output is valid Vue + TypeScript for the current project style
 
