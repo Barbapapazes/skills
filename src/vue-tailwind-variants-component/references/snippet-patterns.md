@@ -27,7 +27,7 @@ The full component snippet starts very light:
 The modal and slideover variants add:
 - `title` and `description` placeholders
 - wrapper usage such as `UModal` or `USlideover`
-- class application using `ui.base({ class: [props.ui?.base, props.class] })`
+- class application using `ui.base({ class: [props.ui?.base, props.class] })` to allow consumer overrides using the `ui` prop and `class` prop. `class` is intentionally merged last to allow it to override any styles.
 - user content inside the wrapper body slot
 
 ## `tv` import rule of thumb
